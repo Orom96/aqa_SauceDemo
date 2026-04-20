@@ -32,12 +32,14 @@ def test_complete_checkout_flow():
 
         #проверка корзины
         # cart_badge = page.locator('[data-test="shopping-cart-badge"]')
-        # expect(cart_badge).to_be_visile
+        # expect(cart_badge).to_have_text("1")
         cart = page.locator('[data-test="shopping-cart-link"]')
-        # expect(cart).to_have_text("1")
-        cart.click()
 
-        #оформление заказа заполнение данных
+        cart.click()
+        # expect(cart_badge).to_contain_text("1")
+        # expect(cart).to_have_text("1")
+        #
+        # #оформление заказа заполнение данных
         checkout = page.locator('[data-test="checkout"]')
         checkout.click()
         checkout_fill_name = page.locator('[data-test="firstName"]')

@@ -1,61 +1,101 @@
-from playwright.sync_api import sync_playwright,expect
+from playwright.sync_api import sync_playwright, expect, Page
+from config.base import BASE_URL, URL_INVENTORY, URL_CART
+from config.users import name, password
+from config.products import backpack
+from pages.base_page import BasePage
 # import pytest
 
-BASE_URL = "https://www.saucedemo.com"
 
-
-def test_complete_checkout_flow():
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False,
-                                    slow_mo=500)  # для наглядности
-        page = browser.new_page()
-
+def login_page(page):
+    # with sync_playwright() as p:
+    #     browser = p.chromium.launch(headless=False,
+    #                                     slow_mo=500)  # для наглядности
+    #     page = browser.new_page()
         # === ШАГ 1: Авторизация ===
-        page.goto(BASE_URL)
+    page.goto(BASE_URL)
+        #2	Ввести логин
+    page.fill("#user-name", name)
+    expect(page.locator("#user-name")).to_have_value(name)
 
-        page.fill("#user-name", "standard_user")
-        expect(page.locator("#user-name")).to_have_value("standard_user")
-        page.fill("#password", "secret_sauce")
-        expect(page.locator("#password")).to_have_value("secret_sauce")
-        page.click("#login-button")
-        expect(page).to_have_url(f"{BASE_URL}/inventory.html")
-        # === ШАГ 2: добавление товара  ===
-        expect(page.locator('//*[@id="item_4_title_link"]/div'))\
-            .to_be_visible()
-        item = page.locator('.inventory_item:has-text("Sauce Labs Backpack")')
-        price_locator = item.locator('.inventory_item_price')
-        price_text = price_locator.inner_text()
-        print(price_text)
-        assert price_text.startswith("$")
-        add_to_cart = page.get_by_text("Sauce Labs Backpack")
-        add_to_cart.click()
+        #3	Ввести пароль
+    page.fill("#password", password)
+    expect(page.locator("#password")).to_have_value(password)
 
-        #проверка корзины
-        # cart_badge = page.locator('[data-test="shopping-cart-badge"]')
-        # expect(cart_badge).to_have_text("1")
-        cart = page.locator('[data-test="shopping-cart-link"]')
+        #4	Нажать Login
+    page.click("#login-button")
 
-        cart.click()
-        # expect(cart_badge).to_contain_text("1")
-        # expect(cart).to_have_text("1")
-        #
-        # #оформление заказа заполнение данных
-        checkout = page.locator('[data-test="checkout"]')
-        checkout.click()
-        checkout_fill_name = page.locator('[data-test="firstName"]')
-        checkout_fill_name.fill('Orom')
-        checkout_fill_last_name = page.locator('[data-test="lastName"]')
-        checkout_fill_last_name.fill('Anvarov')
-        checkout_fill_zip = page.locator('[data-test = "postalCode"]')
-        checkout_fill_zip.fill('734000')
-        btn_continue = page.locator('[data-test="continue"]')
-        btn_continue.click()
-        btn_finish = page.locator('[data-test="finish"]')
-        btn_finish.click()
-        locator = page.locator("text=Thank you for your order!")
-        expect(locator).to_be_visible()
-        btn_back_to_home = page.locator('[data-test="back-to-products"]')
-        btn_back_to_home.click()
+
+def test_login_page(page):
+    login_page(page)
+
+
+def test_page_inventory(page):
+    login_page(page)  #вызов теста логинна
+    page.goto(URL_INVENTORY)
+    expect(page).to_have_url(URL_INVENTORY)
+        #5 Найти товар "Sauce Labs Backpack"
+    expect(page.locator('//*[@id="item_4_title_link"]/div'))\
+        .to_be_visible()
+
+    #6	Сохранить цену товара
+    item = page.locator('.inventory_item:has-text("Sauce Labs Backpack")')
+    price_locator = item.locator('.inventory_item_price')
+    price_text = price_locator.inner_text()
+    print(price_text)
+    assert price_text.startswith("$")
+
+    #7	Нажать "Add to cart" для товара
+    find_product = page.get_by_text(backpack)
+    find_product.click()
+    add_to_cart = page.locator('[data-test="add-to-cart"]')
+    add_to_cart.click()
+
+    # text = add_to_cart.text_content()
+    # assert "Remove" in text
+
+    #проверка корзины
+    cart_badge = page.locator('[data-test="shopping-cart-badge"]')
+    # expect(cart_badge).to_have_text("1")
+
+    cart = page.locator('[data-test="shopping-cart-link"]')
+    cart.click()
+
+
+def test_page_cart(page):
+    login_page(page)  #вызов теста логинна
+    test_page_inventory(page)  #вызов теста где идет выборка товара
+    page.goto(URL_CART)
+    expect(page).to_have_url(URL_CART)
+    qty_locator = page.locator('[data-test="item-quantity"]')
+    qty_locator.count()
+    expect(qty_locator).to_have_text("1")
+    item = page.locator('.cart_item').all()
+    assert len(item) == 1
+    # assert len(qty_locator) == 1
+    # expect(cart_badge).to_contain_text("1")
+    # expect(cart).to_have_text("1")
+    #
+    # #оформление заказа заполнение данных
+    checkout = page.locator('[data-test="checkout"]')
+    checkout.click()
+
+    checkout_fill_name = page.locator('[data-test="firstName"]')
+    checkout_fill_name.fill('Orom')
+    checkout_fill_last_name = page.locator('[data-test="lastName"]')
+    checkout_fill_last_name.fill('Anvarov')
+    checkout_fill_zip = page.locator('[data-test = "postalCode"]')
+    checkout_fill_zip.fill('734000')
+    btn_continue = page.locator('[data-test="continue"]')
+    btn_continue.click()
+    btn_finish = page.locator('[data-test="finish"]')
+    btn_finish.click()
+    locator = page.locator("text=Thank you for your order!")
+    expect(locator).to_be_visible()
+    btn_back_to_home = page.locator('[data-test="back-to-products"]')
+    btn_back_to_home.click()
+
+
+
 
         #
         # # === ШАГ 2: Найти товар и сохранить цену ===

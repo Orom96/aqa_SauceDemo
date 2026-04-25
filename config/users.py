@@ -1,2 +1,5 @@
 name = "standard_user"
 password = "secret_sauce"
+first_name = "Joe"
+last_name = "Lowson"
+postal_code = "1234"

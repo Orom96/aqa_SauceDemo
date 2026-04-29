@@ -1,1 +1,1 @@
-backpack_name= "Sauce Labs Backpack"
+BACKPACK_NAME= "Sauce Labs Backpack"

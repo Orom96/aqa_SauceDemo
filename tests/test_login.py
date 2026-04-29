@@ -5,7 +5,7 @@ from pages.cart_page import CartPage
 from pages.checkout_page import CheckoutPage
 
 from config.base import BASE_URL, URL_INVENTORY
-from config.users import name, password
+from config.users import NAME, PASSWORD
 from config.products import backpack
 
 
@@ -18,7 +18,7 @@ def test_complete_checkout_flow(page):
 
     # Login
     login_page.open(BASE_URL)
-    login_page.login(name, password)
+    login_page.login(NAME, PASSWORD)
     login_page.assert_logged_in(URL_INVENTORY)
 
     # Product

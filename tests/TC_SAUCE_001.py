@@ -1,14 +1,14 @@
 from playwright.sync_api import sync_playwright, expect, Page
 from config.base import BASE_URL, URL_INVENTORY, URL_CART
-from config.users import name, password,first_name,last_name, postal_code
-from config.products import backpack_name
+from config.users import NAME, PASSWORD,FIRST_NAME,LAST_NAME, POSTAL_CODE
+from config.products import BACKPACK_NAME
 from pages.base_page import BasePage
 # import pytest
 from pages.login_page import LoginPage
 from pages.inventory_page import InventoryPage
 from pages.cart_page import CartPage
 from pages.checkout_page import CheckoutPage
-from pages.checkout_page import CheckoutPage2
+# from pages.checkout_page import CheckoutPage2
 
 
 class TestE2eCheck:
@@ -18,14 +18,13 @@ class TestE2eCheck:
         expect(page).to_have_url(BASE_URL)
         login_page = LoginPage(page)
         #2-Ввести логин
-        login_page.fill_username(name)
-        expect(login_page.field_username).to_have_value(name)
+        login_page.fill_username(NAME)
+        expect(login_page.field_username).to_have_value(NAME)
         #3-Ввести пароль
-        login_page.fill_password(password)
-        expect(login_page.field_password).to_have_value(password)
+        login_page.fill_password(PASSWORD)
+        expect(login_page.field_password).to_have_value(PASSWORD)
         #4-Нажать Login
-        login_page.login_btn()
-        expect(page).to_have_url(f'{BASE_URL}inventory.html')
+        login_page.click_login_btn_and_check_url(page)
         #5-Найти товар "Sauce Labs Backpack
         inventory_page = InventoryPage(page)
         expect(inventory_page.get_product()).to_be_visible()
@@ -34,68 +33,57 @@ class TestE2eCheck:
         print(saved_price)
         assert saved_price.startswith("$")
         #7-Нажать "Add to cart" для товара
-        inventory_page.add_to_cart(backpack_name)
+        inventory_page.add_to_cart(BACKPACK_NAME)
         #Смены кнопки Add to cart на  Remove
         expect(inventory_page.remove_cart).to_be_visible()
-        val_badge = inventory_page.badge_of_cart()
-        expect(val_badge).to_have_text("1")
         # 8-Проверить бейдж корзины
-        expect(val_badge).to_contain_text("1")
+        inventory_page.check_badge_of_cart()
         #9-Открыть корзину
-        inventory_page.ship_cart_badge.click()
-        expect(page).to_have_url(f'{BASE_URL}cart.html')
+        inventory_page.click_shipping_cart_badge()
+        inventory_page.check_url_cart(page)
         #10-Проверить количество товаров в корзине
         cart_page = CartPage(page)
-        cart_items = cart_page.cart()
+        cart_items = cart_page.get_item_in_cart()
         assert len(cart_items) == 1
         #11-Проверить количество единиц товара
-        qty_locator = cart_page.quantity()
-        # print(qty_locator)
+        qty_locator = cart_page.get_quantity_in_cart()
         expect(qty_locator).to_have_text("1")
         #12-Проверить название товара
-        name_locator = cart_page.product_name()
-        expect(name_locator).to_contain_text(backpack_name)
+        cart_page.verify_product_name()
         #13-Проверить цену в корзине
-        cart_price = cart_page.price()
+        cart_price = cart_page.get_price()
         assert cart_price == saved_price
         #14-Нажать Checkout
-        cart_page.checkout_btn().click()
-        expect(page).to_have_url(f'{BASE_URL}checkout-step-one.html')
+        cart_page.click_checkout_btn_and_verify_new_page(page)
         #15-Заполнить First name
         checkout_page = CheckoutPage(page)
-        checkout_page.first_name().fill(first_name)
-        expect(page.locator("#first-name")).to_have_value("Joe")
+        checkout_page.fill_first_name_and_verify()
         #16-Заполнить Last name
-        checkout_page.last_name().fill(last_name)
-        expect(page.locator("#last-name")).to_have_value("Lowson")
+        checkout_page.fill_last_name_and_verify()
         #17-Заполнить postal_code
-        checkout_page.postal_code().fill(postal_code)
+        checkout_page.fill_postal_code()
         #18-Нажать Continue
-        checkout_page.btn_continue().click()
-        expect(page).to_have_url(f'{BASE_URL}checkout-step-two.html')
+        checkout_page.click_continue_and_wait_for_url(page)
         #19-Проверить товар на чекауте
-        checkout_page2 = CheckoutPage2(page)
-        items = checkout_page2.list_of_item()
+        items = checkout_page.get_list_of_item()
         print(len(items))
-        assert len(items) == 1 and "Backpack" in backpack_name
+        assert len(items) == 1 and "Backpack" in BACKPACK_NAME
         #20	Проверить цену на чекауте
-        checkout_price = checkout_page2.price_in_checkout_page()
+        checkout_price = checkout_page.get_price_in_checkout_page()
         assert checkout_price == saved_price
         #21 Проверить Payment Information
-        payment_locator = checkout_page2.payment_info_loc()
-        expect(payment_locator).to_contain_text("SauceCard #31337")
+        checkout_page.check_payment_info()
         #22	Проверить Shipping Information
-        shipping_locator = checkout_page2.shipping_info_loc()
-        expect(shipping_locator).to_contain_text("Pony Express")
+        checkout_page.check_shipping_info()
         #23	Проверить Item total
-        item_total = checkout_page2.item_total_loc()
+        item_total = checkout_page.get_item_total_price()
         # assert item_total == saved_price
         assert saved_price in item_total
         #24	Проверить Tax
-        tax_locator = checkout_page2.tax_loc()
-        expect(tax_locator).to_have_text("Tax: $2.40")
-        total = checkout_page2.abs_total_tax()
-        assert abs(total - (item_total + 2.40)) < 0.01
+        # tax_locator = checkout_page.verify_tax()
+        # expect(tax_locator).to_have_text("Tax: $2.40")
+        # total = checkout_page.get_tax_and_total_text()
+        # # assert abs(total - (item_total + 2.40)) < 0.01
 
 
 

@@ -12,3 +12,13 @@ def page():
         page = browser.new_page()
         page.goto(BASE_URL)
         yield page
+
+
+def mobile():
+    with sync_playwright() as p:
+        drv_bro = p.webkit
+        drv_bro = p.chromium.launch(headless=False,
+                                        slow_mo=500)  # для наглядности
+        page = drv_bro.new_page()
+        page.goto(BASE_URL)
+        yield page

@@ -1,6 +1,5 @@
 # Базовый класс страницы
 from playwright.sync_api import sync_playwright, expect
-# from conftest import page
 from config.base import BASE_URL
 
 

@@ -1,0 +1,5 @@
+NAME = "standard_user"
+PASSWORD = "secret_sauce"
+FIRST_NAME = "Joe"
+LAST_NAME = "Lowson"
+POSTAL_CODE = "1234"

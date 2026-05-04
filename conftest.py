@@ -2,6 +2,8 @@
 import pytest
 from playwright.sync_api import sync_playwright
 from config.base import BASE_URL
+from config.users import NAME_PROBLEM_USER, NAME_PERFORMANCE_GLITCH_USER, PASSWORD
+from pages.login_page import LoginPage
 
 
 @pytest.fixture
@@ -12,6 +14,27 @@ def page():
         page = browser.new_page()
         page.goto(BASE_URL)
         yield page
+
+
+@pytest.fixture(params=[
+    {"username": NAME_PROBLEM_USER, "password": PASSWORD},
+    {"username": NAME_PERFORMANCE_GLITCH_USER, "password": PASSWORD},
+
+])
+def user_data(request):
+    return request.param
+
+
+@pytest.fixture
+def logged_in_page(page, user_data):
+    login_page = LoginPage(page)
+    login_page.open()
+    login_page.fill_username(user_data["username"])
+    login_page.fill_password(user_data["password"])
+    login_page.click_login_btn_and_check_url(page)
+
+    return page
+
 
 
 def mobile():

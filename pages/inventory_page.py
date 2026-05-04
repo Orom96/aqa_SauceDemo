@@ -10,7 +10,8 @@ class InventoryPage(BasePage):
         self.product = self.page.get_by_text("Sauce Labs Backpack")
         self.price_of_product = self.page.\
             locator('.inventory_item:has-text("Sauce Labs Backpack") \
-            .inventory_item_price')
+                     .inventory_item_price'
+                    )
         self.add_cart = self.page.\
             locator('#add-to-cart-sauce-labs-backpack')
 

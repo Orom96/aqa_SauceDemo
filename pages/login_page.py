@@ -48,5 +48,5 @@ class LoginPage(BasePage):
         expect(self.error). \
             to_contain_text("Epic sadface: Username and password do not\
                      match any user in this service")
-
+        return self.error
 

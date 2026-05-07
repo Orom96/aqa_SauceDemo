@@ -85,3 +85,14 @@ class TestLogin:
         for _ in range(6):
             login_page.login("standard_user", "wrong_password")
         expect(login_page.check_error_message_xss()).to_be_visible()
+
+        #TC_AUTH_010	Сохранение сессии после перезагрузки страницы
+    def test_login_010(self, page):
+        login_page = LoginPage(page)
+        login_page.open()
+        login_page.login(NAME, PASSWORD)
+        # expect(page).to_have_url("**/inventory.html")
+        # перезагрузка
+        page.reload()
+        assert page.url.endswith("/inventory.html")
+        # expect(page.locator(".inventory_list")).to_be_visible()

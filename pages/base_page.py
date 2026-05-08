@@ -11,6 +11,9 @@ class BasePage:
     def navigate(self, url):
         self.page.goto(url)
 
+    def open(self, url=BASE_URL):
+        pass
+
     def expect_to_have_url(self, url_endpoint: str):
         expect(self.page).to_have_url(BASE_URL + url_endpoint)
 

@@ -1,4 +1,5 @@
 # # Кейсы TC_AUTH_*
+import allure
 from playwright.sync_api import expect
 from config.base import BASE_URL
 from config.users import (NAME, PASSWORD, NAME_PROBLEM_USER, \
@@ -14,10 +15,14 @@ from pages.checkout_page import CheckoutPage
 from pages.complete_page import CompletePage
 from config.base import (LOG_INF, EMPTY_USERNAME, EMPTY_PASSWORD_TEXT,
                          SQL_INJECTION, XSS_TEXT)
+import allure
 
 
+@allure.epic("TestLogin")
+@allure.feature("test")
+@allure.story("tc_auth")
 class TestLogin:
-
+    @allure.title("test_login_001 Успешный вход со стандартным пользователем")
     # TC_AUTH_001
     def test_login_001(self, page):
         login_page = LoginPage(page)
@@ -31,13 +36,14 @@ class TestLogin:
         expect(inventory_page.get_product()).to_be_visible()
         assert "/inventory.html" in page.url
 
-    # TC_AUTH_002	Успешный вход с другими валидными пользователями
+    # TC_AUTH_002
+    @allure.title("test_login_002_Успешный вход с другими валидными пользователями")
     def test_login_002(self, logged_in_page):
         inventory_page = InventoryPage(logged_in_page)
         expect(inventory_page.get_product()).to_be_visible()
 
-    # TC_AUTH_003	Вход с неверным паролем
-
+    # TC_AUTH_003
+    @allure.title("test_login_003_Вход с неверным паролем")
     def test_login_003(self, page):
         login_page = LoginPage(page)
         login_page.open()
@@ -45,6 +51,7 @@ class TestLogin:
         login_page.check_error_message(LOG_INF)
 
     # TC_AUTH_004	Вход с несуществующим логином
+    @allure.title("test_login_004_Вход с несуществующим логином")
     def test_login_004(self, page):
         login_page = LoginPage(page)
         login_page.open()
@@ -52,6 +59,7 @@ class TestLogin:
         login_page.check_error_message(LOG_INF)
 
     # TC_AUTH_005	Пустой логин
+    @allure.title("test_login_005_Пустой логин")
     def test_login_005(self, page):
         login_page = LoginPage(page)
         login_page.open()
@@ -59,7 +67,7 @@ class TestLogin:
         login_page.check_error_message(EMPTY_USERNAME)
 
     # TC_AUTH_006	Пустой пароль
-
+    @allure.title("test_login_006_Пустой пароль")
     def test_login_006(self, page):
         login_page = LoginPage(page)
         login_page.open()
@@ -67,6 +75,7 @@ class TestLogin:
         login_page.check_error_message(EMPTY_PASSWORD_TEXT)
 
     #TC_AUTH_007	SQL-инъекция в логин (базовая безопасность)
+    @allure.title("test_login_007_SQL-инъекция в логин (базовая безопасность)")
     def test_login_007(self, page):
         login_page = LoginPage(page)
         login_page.open()
@@ -74,6 +83,7 @@ class TestLogin:
         login_page.check_error_message(SQL_INJECTION)
 
     #TC_AUTH_008	XSS-попытка в поле логина
+    @allure.title("test_login_008_XSS-попытка в поле логина")
     def test_login_008(self, page):
         login_page = LoginPage(page)
         login_page.open()
@@ -81,14 +91,16 @@ class TestLogin:
         login_page.check_error_message(XSS_TEXT)
 
     #TC_AUTH_009	Блокировка после 5 неудачных попыток
+    @allure.title("test_login_009_Блокировка после 5 неудачных попыток")
     def test_login_009(self, page):
         login_page = LoginPage(page)
         login_page.open()
         for _ in range(6):
             login_page.login(NAME, WRONG_PASS)
-        expect(login_page.check_error_message(XSS_TEXT)).to_be_visible()
+            login_page.check_error_message(XSS_TEXT)
 
         #TC_AUTH_010	Сохранение сессии после перезагрузки страницы
+    @allure.title("test_login_010_Сохранение сессии после перезагрузки страницы")
     def test_login_010(self, page):
         login_page = LoginPage(page)
         login_page.open()

@@ -1,40 +1,3 @@
-# #✅ 2. Делай новое задание
-# Теперь:
-# создаёшь тесты
-# коммитишь изменения
-# ✅ 3. Проверяешь перед push
-# Очень важно:
-# git status
-
-# ✅ 4. Добавляешь изменения
-# git add .
-#
-# ✅ 5. Commit
-# git commit -m "Add API tests"
-#
-# ✅ 6. Push новой ветки
-# Первый push:
-# git push -u origin API_TESTS
-# (вместо API_TESTS — твоя ветка)
-#
-# ✅ 7. Создаёшь PR
-# В GitHub появится кнопка:
-# Compare & pull request
-# Нажимаешь → создаёшь PR → ждёшь ревью.
-#
-# 🧠 Твой workflow теперь такой
-# main ↓new branch ↓code ↓commit ↓push ↓PR ↓merge ↓delete branch
-#
-# 💡 Совет
-# Перед каждым новым заданием всегда:
-# git checkout maingit pull origin maingit checkout -b NEW_BRANCH
-# Это спасает от огромного количества проблем 👍
-
-#TC_INV_001	Отображение всех 6 товаров
-
-from playwright.sync_api import expect
-from config.base import BASE_URL
-from config.users import (NAME, PASSWORD)
 from config.products import EXPECTED_ITEMS, EXPECTED_PRICES, \
     EXPECTED_SORT_PRICES
 from pages.base_page import BasePage
@@ -42,6 +5,8 @@ from pages.login_page import LoginPage
 from pages.inventory_page import InventoryPage
 from config.products import BACKPACK_NAME
 import allure
+
+
 @allure.epic("TestInventory")
 @allure.feature("test")
 @allure.story("TC_INVENTORY")
@@ -96,7 +61,8 @@ class TestInventory:
         inventory_page = InventoryPage(logged_in_page)
         sort_a_to_z = inventory_page.check_sort_a_to_z()
         actual_items_names = inventory_page.get_list_of_item()
-        assert actual_items_names == sorted(actual_items_names)
+        with allure.step("Проверка сортировки товаров по имени A-Z"):
+            assert actual_items_names == sorted(actual_items_names)
 
     @allure.title("test_inv_008_Фильтрация после добавления в корзину")
     #TC_INV_008	Фильтрация после добавления в корзину
@@ -112,16 +78,16 @@ class TestInventory:
     def test_inv_009(self, logged_in_page):
         inventory_page = InventoryPage(logged_in_page)
         inventory_page.click_on_img()
-        assert "inventory-item.html" in logged_in_page.url
+        inventory_page.check_url("inventory-item.html")
 
     # TC_INV_010	Проверка кнопки "Remove" после добавления в корзину
     @allure.title("test_inv_010_Проверка кнопки 'Remove'после добавления в корзину")
     def test_inv_010(self, logged_in_page):
         inventory_page = InventoryPage(logged_in_page)
         inventory_page.add_to_cart(product_name=BACKPACK_NAME)
-        sort_low_to_high = inventory_page.check_sort_low_high()
+        inventory_page.check_sort_low_high()
         inventory_page.check_badge_of_cart()
-        assert inventory_page.check_remove_btn_visible
+        inventory_page.check_remove_btn_visible()
 
 
 

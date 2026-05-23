@@ -40,7 +40,7 @@ class TestLogin:
     @allure.title("test_login_002_Успешный вход с другими валидными пользователями")
     def test_login_002(self, logged_in_page):
         inventory_page = InventoryPage(logged_in_page)
-        expect(inventory_page.get_product()).to_be_visible()
+        inventory_page.check_product_visible()
 
     # TC_AUTH_003
     @allure.title("test_login_003_Вход с неверным паролем")

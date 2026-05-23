@@ -1,6 +1,7 @@
 # Страница товаров
 from playwright.sync_api import expect
 from pages.base_page import BasePage
+import allure
 
 
 class InventoryPage(BasePage):
@@ -64,8 +65,16 @@ class InventoryPage(BasePage):
     def check_sort_a_to_z(self):
         return self.sort_lo_hi.select_option("az")
 
-    def check_remove_btn_visible(self):
-        expect(self.remove_btn).to_be_visible()
+    # def check_remove_btn_visible(self):
+    #     expect(self.remove_btn).to_be_visible()
 
     def click_on_img(self):
         self.img.click()
+
+    def check_remove_btn_visible(self):
+        assert self.remove_btn.is_visible(), \
+            "Кнопка Remove не отображается после добавления товара в корзину"
+
+    def check_product_visible(self):
+        with allure.step("Проверка: товар отображается на странице"):
+            expect(self.get_product()).to_be_visible()

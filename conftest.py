@@ -5,7 +5,7 @@ from config.base import BASE_URL
 from config.users import NAME_PROBLEM_USER, NAME_PERFORMANCE_GLITCH_USER,\
     PASSWORD,NAME
 from pages.login_page import LoginPage
-
+import allure
 
 @pytest.fixture
 def page():
@@ -26,6 +26,7 @@ def user_data(request):
     return request.param
 
 
+@allure.title("Авторизация пользователя")
 @pytest.fixture
 def logged_in_page(page):
     login_page = LoginPage(page)
@@ -35,7 +36,6 @@ def logged_in_page(page):
     login_page.click_login_btn_and_check_url(page)
 
     return page
-
 
 
 def mobile():

@@ -18,9 +18,8 @@ class BasePage:
     def expect_to_have_url(self, url_endpoint: str):
         expect(self.page).to_have_url(BASE_URL + url_endpoint)
 
+    @allure.step("Проверка: открыта страница '{url}'")
     def check_url(self, url):
-        with allure.step(f"Проверка: открыта страница '{url}'"):
-            assert url in self.page.url
-
+        expect(self.page).to_have_url(url)
 
 

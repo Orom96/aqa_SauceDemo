@@ -12,8 +12,7 @@ class InventoryPage(BasePage):
             locator('.inventory_item:has-text("Sauce Labs Backpack") \
                      .inventory_item_price'
                     )
-        self.add_cart = self.page.\
-            locator('#add-to-cart-sauce-labs-backpack')
+        self.add_cart = self.page.get_by_role("button", name="Add to cart")
 
         self.remove_cart = self.page.\
             locator('[data-test="remove-sauce-labs-backpack"]')
@@ -28,11 +27,24 @@ class InventoryPage(BasePage):
     def save_price(self):
         return self.price_of_product.inner_text()
 
+    # def add_to_cart(self, product_name):
+    #     self.add_cart.click()
     def add_to_cart(self, product_name):
-        self.add_cart.click()
+        product = self.page.locator(
+            f'.inventory_item:has-text("{product_name}")'
+        )
+
+        product.get_by_role(
+            "button",
+            name="Add to cart"
+        ).click()
 
     def check_badge_of_cart(self):
         expect(self.cart_badge).to_have_text("1")
+
+    def check_badge_of_cart_several(self):
+        return self.cart_badge
+
 
     def click_shipping_cart_badge(self):
         self.ship_cart_badge.click()

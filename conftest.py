@@ -2,7 +2,7 @@
 import pytest
 from playwright.sync_api import sync_playwright
 from config.base import BASE_URL
-from config.users import NAME_PROBLEM_USER, NAME_PERFORMANCE_GLITCH_USER, PASSWORD
+from config.users import NAME,NAME_PROBLEM_USER, NAME_PERFORMANCE_GLITCH_USER, PASSWORD
 from pages.login_page import LoginPage
 
 
@@ -17,9 +17,9 @@ def page():
 
 
 @pytest.fixture(params=[
+    {"username": NAME, "password": PASSWORD},
     {"username": NAME_PROBLEM_USER, "password": PASSWORD},
     {"username": NAME_PERFORMANCE_GLITCH_USER, "password": PASSWORD},
-
 ])
 def user_data(request):
     return request.param

@@ -4,7 +4,6 @@ from pages.base_page import BasePage
 from config.base import BASE_URL
 
 
-
 class LoginPage(BasePage):
     def __init__(self, page):
         super().__init__(page)
